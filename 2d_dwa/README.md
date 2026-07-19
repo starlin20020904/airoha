@@ -22,6 +22,8 @@ segmentation mismatch error**.
 | `run_selection_figures.py` | Generates figures 1–3 |
 | `run_spectrum_figures.py` | Generates figure 4 |
 | `run_explainer_figures.py` | Generates figures 5–6 (architecture rationale) |
+| `run_explainer_figures_zh.py` | Traditional-Chinese versions of figures 5–6 (`*_zh.png`) |
+| `run_animation.py` | `anim_2d_dwa.gif` — animated selection process (Chinese labels, 2 s/frame) |
 | `figures/` | Output PNGs |
 
 ## How to run

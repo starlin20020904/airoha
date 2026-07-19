@@ -14,6 +14,16 @@ C_2DDWA = "#eb6834"      # orange - proposed 2-D DWA
 C_SELECTED = "#d62d20"   # red, matching the paper's Fig. 1 convention
 
 
+def use_chinese():
+    """Register the system CJK font (WenQuanYi Zen Hei, supports
+    Traditional Chinese) and make it the default text font."""
+    from matplotlib import font_manager
+    font_manager.fontManager.addfont(
+        "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc")
+    mpl.rcParams["font.family"] = ["WenQuanYi Zen Hei", "DejaVu Sans"]
+    mpl.rcParams["axes.unicode_minus"] = False
+
+
 def apply_style():
     mpl.rcParams.update({
         "figure.facecolor": SURFACE,
