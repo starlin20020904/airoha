@@ -21,6 +21,7 @@ segmentation mismatch error**.
 | `test_dwa.py` | Verification (run `python3 test_dwa.py`) |
 | `run_selection_figures.py` | Generates figures 1–3 |
 | `run_spectrum_figures.py` | Generates figure 4 |
+| `run_explainer_figures.py` | Generates figures 5–6 (architecture rationale) |
 | `figures/` | Output PNGs |
 
 ## How to run
@@ -40,6 +41,8 @@ python3 run_spectrum_figures.py
 | `fig2_usage_uniformity.png` | (concept) | Cumulative element usage: thermometer selection wears out the bottom rows; 2-D DWA uses every element equally (max−min ≤ 1) |
 | `fig3_equivalence.png` | Section II-A + Table 1 | 2-D DWA is bit-exact identical to 1-D DWA over 20,000 random samples, while its control-signal count grows as 7·2^(N/2) instead of 2^N |
 | `fig4_spectrum_comparison.png` | Paper Fig. 14 | Output and mismatch-error spectra under 0.5 % element / 1 % segmentation mismatch. 2-D DWA: SNDR ≈ 107 dB (paper: 107.5 dB), first-order-shaped error (+20 dB/dec); the segmented baseline is limited by unshaped segmentation error |
+| `fig5_architecture_flow.png` | Figs. 3, 6–10 (rationale) | Signal-flow diagram: the 64-element rotation is two-digit base-8 pointer arithmetic — LSB drives the column DWA, MSB (+ carry + nfull) drives the row DWA, and per-cell selection is an AND of shared row/column wires |
+| `fig6_worked_example.png` | Fig. 5 + Section II-B | Step-by-step {8, 9, 4, 18} example showing exactly when `carry` and `nfull` fire and how `rows = MSB + carry + nfull` |
 
 ## Modeling notes and simplifications
 
