@@ -1,15 +1,16 @@
-"""Animated GIF of the 2-D DWA selection process (Chinese labels).
+"""Animation of the 2-D DWA selection process (Chinese labels).
 
-anim_2d_dwa.gif - plays the paper's Fig. 1 input sequence
-{3, 9, 15, 27, 13, 12, 34, 20, 13} sample by sample: red = elements
-selected this sample, gray shading = how many times each element has
-been used so far. The side panel shows the decoder signals.
+anim_2d_dwa.gif / anim_2d_dwa.mp4 - play the paper's Fig. 1 input
+sequence {3, 9, 15, 27, 13, 12, 34, 20, 13} sample by sample: red =
+elements selected this sample, gray shading = how many times each
+element has been used so far. The side panel shows the decoder signals.
+The MP4 (H.264) is for viewers that show GIFs as still images and for
+embedding in slides.
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
-from matplotlib.animation import PillowWriter
 
 from dwa_core import dwa_2d_masks
 import plot_style as ps
@@ -93,7 +94,8 @@ def draw_frame(ax_grid, ax_txt, n, masks, sig, used_before):
                 ha="left", linespacing=1.55)
 
 
-def main():
+def render_frames():
+    """Yield each animation state as an RGB numpy array (2 s per state)."""
     masks, sig = dwa_2d_masks(SEQ, nbits=6, return_signals=True)
     masks = masks.reshape(-1, 8, 8)
     used_before = (masks.cumsum(axis=0) - masks)
@@ -101,18 +103,33 @@ def main():
     fig, (ax_grid, ax_txt) = plt.subplots(
         1, 2, figsize=(9.6, 5.2), width_ratios=[1, 1.15])
     fig.subplots_adjust(left=0.04, right=0.99, top=0.9, bottom=0.03)
+    fig.set_dpi(100)
 
-    writer = PillowWriter(fps=1)
-    with writer.saving(fig, f"{FIGDIR}/anim_2d_dwa.gif", dpi=100):
-        draw_frame(ax_grid, ax_txt, -1, masks, sig, used_before)
-        writer.grab_frame()
-        writer.grab_frame()          # hold intro for 2 s
-        for n in range(len(SEQ)):
-            draw_frame(ax_grid, ax_txt, n, masks, sig, used_before)
-            writer.grab_frame()
-            writer.grab_frame()      # hold each sample for 2 s
+    for n in range(-1, len(SEQ)):
+        draw_frame(ax_grid, ax_txt, n, masks, sig, used_before)
+        fig.canvas.draw()
+        buf = np.asarray(fig.canvas.buffer_rgba())[:, :, :3].copy()
+        yield buf
     plt.close(fig)
-    print("animation written to", f"{FIGDIR}/anim_2d_dwa.gif")
+
+
+def main():
+    import imageio.v3 as iio
+
+    frames = list(render_frames())
+    # H.264 needs even pixel dimensions
+    h, w = frames[0].shape[:2]
+    frames = [f[:h - h % 2, :w - w % 2] for f in frames]
+
+    iio.imwrite(f"{FIGDIR}/anim_2d_dwa.gif", frames, duration=2000, loop=0)
+
+    # 2 s per state, extra hold on the final state before the loop restarts
+    mp4_frames = frames + [frames[-1]]
+    iio.imwrite(f"{FIGDIR}/anim_2d_dwa.mp4",
+                [f for fr in mp4_frames for f in [fr] * 2],   # 2 s @ 1 fps
+                fps=1, codec="libx264", output_params=["-pix_fmt", "yuv420p"])
+    print("animation written to",
+          f"{FIGDIR}/anim_2d_dwa.gif and {FIGDIR}/anim_2d_dwa.mp4")
 
 
 if __name__ == "__main__":
